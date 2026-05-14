@@ -73,153 +73,172 @@
                         @forelse($locations as $location)
                             <tr>
 
-                                <td class="px-8 py-6 dark:text-slate-200 font-bold">{{ $location->name }}</td>
-                                <td class="px-8 py-6 dark:text-slate-200">{{ $location->email }}</td>
-                                <td class="px-8 py-6 dark:text-slate-200">20</td>
+                                <td class="px-8 py-6 dark:text-slate-200 font-bold">{{ $location->location_name }}</td>
                                 <td class="px-8 py-6 dark:text-slate-200">
-                                    <a href="{{ route('petugas.show', $location->uuid) }}"
+                                    {{ $location->size === 'small' ? 'Lokasi Kecil' : ($location->size === 'medium' ? 'Lokasi Sedang' : 'Lokasi Besar') }}
+                                </td>
+                                <td class="px-8 py-6 dark:text-slate-200">
+                                    @switch($location->status)
+                                        @case('available')
+                                            <span class="bg-green-600 rounded-md px-2 py-1 text-xs">Lokasi Tersedia</span>
+                                        @break
+
+                                        @case('close')
+                                            <span class="bg-red-600 rounded-md px-2 py-1 text-xs">Lokasi Ditutup</span>
+                                        @break
+
+                                        @case('full')
+                                            <span class="bg-gray-600 rounded-md px-2 py-1 text-xs">Lokasi Penuh</span>
+                                        @break
+
+                                        @default
+                                            <span class="bg-yellow-600 rounded-md px-2 py-1 text-xs">Lokasi Maintenance</span>
+                                    @endswitch
+                                </td>
+                                <td class="px-8 py-6 dark:text-slate-200">
+                                    <a href="{{ route('lokasi.show', $location->uuid) }}"
                                         class="px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-700 hover:to-violet-700 transition-all duration-300 ease-out hover:scale-105 hover:-translate-y-0.5">detail</a>
                                 </td>
 
                             </tr>
 
-                        @empty
+                            @empty
 
-                            <tr>
-                                <td class="px-8 py-6 text-center dark:text-slate-200 font-bold" colspan="4">Data
-                                    tidak ditemukan</td>
-                            </tr>
-                        @endforelse
+                                <tr>
+                                    <td class="px-8 py-6 text-center dark:text-slate-200 font-bold" colspan="4">Data
+                                        tidak ditemukan</td>
+                                </tr>
+                            @endforelse
 
-                    </tbody>
+                        </tbody>
 
-                </table>
+                    </table>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        {{-- MODAL --}}
+        <x-modal name="create-user" :show="false" focusable>
 
-    {{-- MODAL --}}
-    <x-modal name="create-user" :show="false" focusable>
+            <div class="p-8 dark:bg-slate-900">
 
-        <div class="p-8 dark:bg-slate-900">
+                <h2 class="text-2xl font-black mb-6 dark:text-white">
+                    Tambah Lokasi
+                </h2>
 
-            <h2 class="text-2xl font-black mb-6 dark:text-white">
-                Tambah Lokasi
-            </h2>
+                <form action="{{ route('lokasi.store') }}" enctype="multipart/form-data" method="post" class="space-y-5">
+                    @csrf
+                    <div>
+                        <x-input-label id="namaLokasi" value="Nama Lokasi" />
 
-            <form action="{{ route('lokasi.store') }}" enctype="multipart/form-data" method="post" class="space-y-5">
-                @csrf
-                <div>
-                    <x-input-label id="namaLokasi" value="Nama Lokasi" />
-
-                    <x-text-input id="namaLokasi" class="block mt-1 w-full" type="text" name="namaLokasi"
-                        :value="old('namaLokasi')" required autofocus autocomplete="namaLokasi" />
-                    <x-input-error :messages="$errors->get('namaLokasi')" class="mt-2" />
-                </div>
-
-                <div>
-                    <x-input-label id="penanggungJawab" value="Penanggung Jawab Ruangan" />
-
-                    <select name="penanggungJawab" id="penanggungJawab"
-                        class="capitalize block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                        <option value="" disabled>Pilih Petugas</option>
-                        @forelse ($users as $user)
-                            <option class="" value="{{ $user->id }}" 
-                                {{ old('penanggungJawab') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                        @empty
-                            <option value="" disabled>Data petugas tidak ada</option>
-                        @endforelse
-
-                    </select>
-
-                    <x-input-error :messages="$errors->get('penanggungJawab')" class="mt-2" />
-                </div>
-
-                <div class="">
-                    <x-input-label value="Size" />
-
-                    <div class="flex gap-6 mt-3">
-                        @foreach (['small', 'medium', 'large'] as $size)
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="size" value="{{ $size }}"
-                                    {{ old('size') == $size ? 'checked' : '' }}
-                                    class="border-slate-300 text-indigo-600 focus:ring-indigo-500">
-
-                                <span class="capitalize text-slate-600">
-                                    {{ $size }}
-                                </span>
-                            </label>
-                        @endforeach
+                        <x-text-input id="namaLokasi" class="block mt-1 w-full" type="text" name="namaLokasi"
+                            :value="old('namaLokasi')" required autofocus autocomplete="namaLokasi" />
+                        <x-input-error :messages="$errors->get('namaLokasi')" class="mt-2" />
                     </div>
 
-                    <x-input-error :messages="$errors->get('size')" class="mt-2" />
-                </div>
+                    <div>
+                        <x-input-label id="penanggungJawab" value="Penanggung Jawab Ruangan" />
 
-                <div class="">
-                    <x-input-label value="Status" />
+                        <select name="penanggungJawab" id="penanggungJawab"
+                            class="capitalize block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                            <option value="" disabled>Pilih Petugas</option>
+                            @forelse ($users as $user)
+                                <option class="" value="{{ $user->id }}"
+                                    {{ old('penanggungJawab') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            @empty
+                                <option value="" disabled>Data petugas tidak ada</option>
+                            @endforelse
 
-                    <div class="flex flex-wrap gap-6 mt-3">
-                        @foreach (['available', 'close', 'full', 'maintenance'] as $status)
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="status" value="{{ $status }}"
-                                    {{ old('status') == $status ? 'checked' : '' }}
-                                    class="border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                        </select>
 
-                                <span class="capitalize text-slate-600">
-                                    {{ $status }}
-                                </span>
-                            </label>
-                        @endforeach
+                        <x-input-error :messages="$errors->get('penanggungJawab')" class="mt-2" />
                     </div>
 
-                    <x-input-error :messages="$errors->get('status')" class="mt-2" />
+                    <div class="">
+                        <x-input-label value="Size" />
 
-                </div>
+                        <div class="flex gap-6 mt-3">
+                            @foreach (['small', 'medium', 'large'] as $size)
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="size" value="{{ $size }}"
+                                        {{ old('size') == $size ? 'checked' : '' }}
+                                        class="border-slate-300 text-indigo-600 focus:ring-indigo-500">
 
-                <div>
-                    <x-input-label id="imageLayout" value="Desain Lokasi" />
+                                    <span class="capitalize text-slate-600">
+                                        {{ $size }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
 
-                    <x-text-input id="imageLayout" class="block mt-1 w-full p-6 border" type="file"
-                        name="imageLayout" :value="old('imageLayout')" required autofocus autocomplete="imageLayout" />
-                    <x-input-error :messages="$errors->get('imageLayout')" class="mt-2" />
-                </div>
+                        <x-input-error :messages="$errors->get('size')" class="mt-2" />
+                    </div>
 
-                <div>
-                    <x-input-label id="desc" value="Deskripsi Lokasi" />
+                    <div class="">
+                        <x-input-label value="Status" />
 
-                    <textarea name="desc"
-                        class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-                        id="desc">{{ old('desc') }}</textarea>
+                        <div class="flex flex-wrap gap-6 mt-3">
+                            @foreach (['available', 'close', 'full', 'maintenance'] as $status)
+                                <label class="flex items-center gap-2">
+                                    <input type="radio" name="status" value="{{ $status }}"
+                                        {{ old('status') == $status ? 'checked' : '' }}
+                                        class="border-slate-300 text-indigo-600 focus:ring-indigo-500">
 
-                    <x-input-error :messages="$errors->get('desc')" class="mt-2" />
-                </div>
+                                    <span class="capitalize text-slate-600">
+                                        {{ $status }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+
+                        <x-input-error :messages="$errors->get('status')" class="mt-2" />
+
+                    </div>
+
+                    <div>
+                        <x-input-label id="imageLayout" value="Desain Lokasi" />
+
+                        <x-text-input id="imageLayout" class="block mt-1 w-full p-6 border" type="file"
+                            name="imageLayout" :value="old('imageLayout')" required autofocus autocomplete="imageLayout" />
+                        <x-input-error :messages="$errors->get('imageLayout')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label id="desc" value="Deskripsi Lokasi" />
+
+                        <textarea name="desc"
+                            class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
+                            id="desc">{{ old('desc') }}</textarea>
+
+                        <x-input-error :messages="$errors->get('desc')" class="mt-2" />
+                    </div>
 
 
-                <div class="flex justify-end gap-3 pt-5">
+                    <div class="flex justify-end gap-3 pt-5">
 
-                    <button type="button" x-on:click="$dispatch('close')"
-                        class="px-6 py-3 rounded-2xl text-slate-500 hover:bg-slate-100">
+                        <button type="button" x-on:click="$dispatch('close')"
+                            class="px-6 py-3 rounded-2xl text-slate-500 hover:bg-slate-100">
 
-                        Batal
+                            Batal
 
-                    </button>
+                        </button>
 
-                    <button type="submit"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-2xl font-bold">
+                        <button type="submit"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-2xl font-bold">
 
-                        Simpan
+                            Simpan
 
-                    </button>
+                        </button>
 
-                </div>
+                    </div>
 
-            </form>
+                </form>
 
-        </div>
+            </div>
 
-    </x-modal>
+        </x-modal>
 
-</x-app-layout>
+    </x-app-layout>

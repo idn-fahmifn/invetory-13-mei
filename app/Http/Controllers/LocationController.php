@@ -46,10 +46,19 @@ class LocationController extends Controller
             $simpan['layout_image'] = $nama;
 
             // simpan ke storage
-            // $gambar->storeAs($path, $nama);
+            $gambar->storeAs($path, $nama);
         }
 
-        return $simpan;
+        Location::create($simpan);
+        return redirect()->route('lokasi.index')->with('success', 'Lokasi berhasil ditambahkan');
 
     }
+
+    public function show($param)
+    {
+        $location = Location::where('uuid', $param)->firstOrFail();
+        return view('locations.show', compact('location'));
+    }
+
+
 }
