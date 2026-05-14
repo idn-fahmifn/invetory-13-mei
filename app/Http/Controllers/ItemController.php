@@ -3,20 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
 
-use App\Models\{Location, User};
+use App\Models\{Item, Location};
 
-class LocationController extends Controller
+class ItemController extends Controller
 {
     public function index()
     {
         $locations = Location::all();
-        $users = User::where('isAdmin', false)->get();
+        $items = Item::all();
 
-        return view('locations.index', compact('locations', 'users'));
+        return view('items.index', compact('locations', 'items'));
     }
 
     public function store(Request $request)
@@ -111,7 +108,7 @@ class LocationController extends Controller
     public function destroy($param)
     {
         $data = Location::where('uuid', $param)->firstOrFail();
-        
+
         $path_lama = 'public/images/locations/'.$data->layout_image;
 
         if ($data->layout_image && Storage::exists($path_lama)) {

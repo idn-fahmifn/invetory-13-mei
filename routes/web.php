@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\{LocationController, PetugasController, ProfileController};
+use App\Http\Controllers\{ItemController, LocationController, PetugasController, ProfileController};
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,11 +21,19 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->group(functio
     Route::post('/petugas', [PetugasController::class, 'store'])->name('petugas.store');
     Route::get('/petugas/{param}', [PetugasController::class, 'show'])->name('petugas.show');
 
-    // routing untuk CRUD petugas.
+    // routing untuk CRUD Lokasi.
     Route::get('/lokasi', [LocationController::class, 'index'])->name('lokasi.index');
     Route::post('/lokasi', [LocationController::class, 'store'])->name('lokasi.store');
     Route::get('/lokasi/{param}', [LocationController::class, 'show'])->name('lokasi.show');
-    Route::post('/lokasi', [LocationController::class, 'store'])->name('lokasi.store');
+    Route::put('/lokasi/{param}', [LocationController::class, 'update'])->name('lokasi.update');
+    Route::delete('/lokasi/{param}', [LocationController::class, 'destroy'])->name('lokasi.destroy');
+
+    // routing untuk CRUD barang.
+    Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
+    Route::post('/barang', [ItemController::class, 'store'])->name('barang.store');
+    Route::get('/barang/{param}', [ItemController::class, 'show'])->name('barang.show');
+    Route::put('/barang/{param}', [ItemController::class, 'update'])->name('barang.update');
+    Route::delete('/barang/{param}', [ItemController::class, 'destroy'])->name('barang.destroy');
 
 });
 
