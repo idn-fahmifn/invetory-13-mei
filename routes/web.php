@@ -25,6 +25,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->group(functio
     Route::get('/lokasi', [LocationController::class, 'index'])->name('lokasi.index');
     Route::post('/lokasi', [LocationController::class, 'store'])->name('lokasi.store');
     Route::get('/lokasi/{param}', [LocationController::class, 'show'])->name('lokasi.show');
+    Route::post('/lokasi', [LocationController::class, 'store'])->name('lokasi.store');
 
 });
 

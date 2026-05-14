@@ -110,7 +110,7 @@
                 Tambah Lokasi
             </h2>
 
-            <form action="" method="post" class="space-y-5">
+            <form action="{{ route('lokasi.store') }}" enctype="multipart/form-data" method="post" class="space-y-5">
                 @csrf
                 <div>
                     <x-input-label id="namaLokasi" value="Nama Lokasi" />
@@ -124,10 +124,10 @@
                     <x-input-label id="penanggungJawab" value="Penanggung Jawab Ruangan" />
 
                     <select name="penanggungJawab" id="penanggungJawab"
-                        class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                        class="capitalize block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                         <option value="" disabled>Pilih Petugas</option>
                         @forelse ($users as $user)
-                            <option value="{{ $user->id }}" class="capitalize"
+                            <option class="" value="{{ $user->id }}" 
                                 {{ old('penanggungJawab') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                         @empty
                             <option value="" disabled>Data petugas tidak ada</option>
