@@ -7,11 +7,11 @@
             <div>
 
                 <h2 class="font-black text-2xl text-slate-800 dark:text-white">
-                    Detail Lokasi
+                    Detail Barang
                 </h2>
 
                 <p class="text-sm text-slate-400 mt-1">
-                    Informasi lengkap lokasi inventory
+                    Informasi lengkap barang
                 </p>
 
             </div>
@@ -19,14 +19,16 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'create-user')"
                     class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-bold text-sm transition">
-                    + Ubah lokasi
+                    + Ubah barang
                 </button>
-                <form action="{{ route('lokasi.destroy', $location->uuid) }}" method="post">
+                <form action="{{ route('barang.destroy', $item->uuid) }}" method="post">
                     @csrf
                     @method('delete')
-                    <button type="submit" onclick="return confirm('Yakin mau dihapus?')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-bold text-sm transition">Hapus Lokasi</button>
+                    <button type="submit" onclick="return confirm('Yakin mau dihapus?')"
+                        class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-bold text-sm transition">Hapus
+                        barang</button>
                 </form>
-                <a href="{{ route('lokasi.index') }}"
+                <a href="{{ route('barang.index') }}"
                     class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-2xl text-sm text-center font-bold">
                     Kembali
                 </a>
@@ -50,11 +52,11 @@
                     <div class="mb-10">
 
                         <h2 class="text-3xl font-black text-slate-800 dark:text-white">
-                            {{ $location->location_name }}
+                            {{ $item->item_name }}
                         </h2>
 
                         <p class="text-slate-400 mt-2">
-                            {{ $location->desc }}
+                            {{ $item->desc }}
                         </p>
 
                     </div>
@@ -64,11 +66,11 @@
                         <div class="bg-slate-50 dark:bg-slate-800 rounded-3xl p-6">
 
                             <p class="text-sm text-slate-400 mb-2">
-                                Nama Lokasi
+                                Nama barang
                             </p>
 
                             <h3 class="font-black text-slate-700 dark:text-white">
-                                {{ $location->location_name }}
+                                {{ $item->item_name }}
                             </h3>
 
                         </div>
@@ -76,11 +78,11 @@
                         <div class="bg-slate-50 dark:bg-slate-800 rounded-3xl p-6">
 
                             <p class="text-sm text-slate-400 mb-2">
-                                Ukuran
+                                Tanggal Pembelian
                             </p>
 
                             <h3 class="font-black text-slate-700 dark:text-white">
-                                {{ $location->size === 'small' ? 'Lokasi Kecil' : ($location->size === 'medium' ? 'Lokasi Sedang' : 'Lokasi Besar') }}
+                                {{ $item->date_purchase->locale('id')->translatedFormat('d F Y') }}
                             </h3>
 
                         </div>
@@ -92,21 +94,18 @@
                             </p>
 
                             <h3 class="font-black text-white">
-                                @switch($location->status)
-                                    @case('available')
-                                        <span class="bg-green-600 rounded-md px-2 py-1 text-xs">Lokasi Tersedia</span>
+                                @switch($item->status)
+                                    @case('good')
+                                        <span class="bg-green-600 rounded-md px-2 py-1 text-xs">Kondisi Normal</span>
                                     @break
 
-                                    @case('close')
-                                        <span class="bg-red-600 rounded-md px-2 py-1 text-xs">Lokasi Ditutup</span>
-                                    @break
-
-                                    @case('full')
-                                        <span class="bg-gray-600 rounded-md px-2 py-1 text-xs">Lokasi Penuh</span>
+                                    @case('broke')
+                                        <span class="bg-red-600 rounded-md px-2 py-1 text-xs">Kondisi Rusak</span>
                                     @break
 
                                     @default
-                                        <span class="bg-yellow-600 rounded-md px-2 py-1 text-xs">Lokasi Maintenance</span>
+                                        <span class="bg-yellow-600 rounded-md px-2 py-1 text-xs">Barang sedang
+                                            maintenance</span>
                                 @endswitch
                             </h3>
 
@@ -115,11 +114,11 @@
                         <div class="bg-slate-50 dark:bg-slate-800 rounded-3xl p-6">
 
                             <p class="text-sm text-slate-400 mb-2">
-                                Total Barang
+                                Deskripsi Barang
                             </p>
 
                             <h3 class="font-black text-slate-700 dark:text-white">
-                                120 Barang
+                                {{ $item->desc }}
                             </h3>
 
                         </div>
@@ -128,7 +127,7 @@
 
                     <div class="mt-8">
 
-                        <img src="{{ asset('storage/images/locations/' . $location->layout_image) }}"
+                        <img src="{{ asset('storage/images/items/' . $item->image) }}"
                             class="rounded-3xl w-full object-cover" alt="Layout">
 
                     </div>
@@ -149,63 +148,45 @@
                 Ubah Lokasi
             </h2>
 
-            <form action="{{ route('lokasi.update', $location->uuid) }}" enctype="multipart/form-data" method="post" class="space-y-5">
+            <form action="{{ route('barang.update', $item->uuid) }}" enctype="multipart/form-data" method="post"
+                class="space-y-5">
                 @csrf
                 @method('put')
                 <div>
-                    <x-input-label id="namaLokasi" value="Nama Lokasi" />
+                    <x-input-label id="namaBarang" value="Nama Barang" />
 
-                    <x-text-input id="namaLokasi" class="block mt-1 w-full" type="text" name="namaLokasi"
-                        :value="old('namaLokasi', $location->location_name)" required autofocus autocomplete="namaLokasi" />
-                    <x-input-error :messages="$errors->get('namaLokasi')" class="mt-2" />
+                    <x-text-input id="namaBarang" class="block mt-1 w-full" type="text" name="namaBarang"
+                        :value="old('namaBarang', $item->item_name)" required autofocus autocomplete="namaBarang" />
+                    <x-input-error :messages="$errors->get('namaBarang')" class="mt-2" />
                 </div>
 
                 <div>
-                    <x-input-label id="penanggungJawab" value="Penanggung Jawab Ruangan" />
+                    <x-input-label id="penyimpanan" value="Lokasi Penyimpanan" />
 
-                    <select name="penanggungJawab" id="penanggungJawab"
+                    <select name="penyimpanan" id="penyimpanan"
                         class="capitalize block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                        <option value="" disabled>Pilih Petugas</option>
-                        @forelse ($users as $user)
-                            <option class="" value="{{ $user->id }}"
-                                {{ old('penanggungJawab', $location->user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                        <option value="" disabled>Pilih Lokasi</option>
+                        @forelse ($locations as $location)
+                            <option class="" value="{{ $location->id }}"
+                                {{ old('penyimpanan',  $item->location_id) == $location->id ? 'selected' : '' }}>
+                                {{ $location->location_name }}</option>
                         @empty
-                            <option value="" disabled>Data petugas tidak ada</option>
+                            <option value="" disabled>Data lokasi tidak ada</option>
                         @endforelse
 
                     </select>
 
-                    <x-input-error :messages="$errors->get('penanggungJawab')" class="mt-2" />
-                </div>
-
-                <div class="">
-                    <x-input-label value="Size" />
-
-                    <div class="flex gap-6 mt-3">
-                        @foreach (['small', 'medium', 'large'] as $size)
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="size" value="{{ $size }}"
-                                    {{ old('size', $location->size) == $size ? 'checked' : '' }}
-                                    class="border-slate-300 text-indigo-600 focus:ring-indigo-500">
-
-                                <span class="capitalize text-slate-600">
-                                    {{ $size }}
-                                </span>
-                            </label>
-                        @endforeach
-                    </div>
-
-                    <x-input-error :messages="$errors->get('size')" class="mt-2" />
+                    <x-input-error :messages="$errors->get('penyimpanan')" class="mt-2" />
                 </div>
 
                 <div class="">
                     <x-input-label value="Status" />
 
                     <div class="flex flex-wrap gap-6 mt-3">
-                        @foreach (['available', 'close', 'full', 'maintenance'] as $status)
+                        @foreach (['good', 'broke', 'maintenance'] as $status)
                             <label class="flex items-center gap-2">
                                 <input type="radio" name="status" value="{{ $status }}"
-                                    {{ old('status', $location->status) == $status ? 'checked' : '' }}
+                                    {{ old('status',  $item->status) == $status ? 'checked' : '' }}
                                     class="border-slate-300 text-indigo-600 focus:ring-indigo-500">
 
                                 <span class="capitalize text-slate-600">
@@ -220,11 +201,19 @@
                 </div>
 
                 <div>
-                    <x-input-label id="imageLayout" value="Desain Lokasi" />
+                    <x-input-label id="tanggalPembelian" value="Tanggal Pembelian" />
 
-                    <x-text-input id="imageLayout" class="block mt-1 w-full p-6 border" type="file"
-                        name="imageLayout" :value="old('imageLayout')" autofocus autocomplete="imageLayout" />
-                    <x-input-error :messages="$errors->get('imageLayout')" class="mt-2" />
+                    <x-text-input id="tanggalPembelian" class="block mt-1 w-full" type="date" name="tanggalPembelian"
+                        :value="old('tanggalPembelian', $item->date_purchase->format('Y-m-d'))" required autofocus autocomplete="tanggalPembelian" />
+                    <x-input-error :messages="$errors->get('tanggalPembelian')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-input-label id="gambarBarang" value="Gambar Barang" />
+
+                    <x-text-input id="gambarBarang" class="block mt-1 w-full p-6 border" type="file"
+                        name="gambarBarang" :value="old('gambarBarang')" autofocus autocomplete="gambarBarang" />
+                    <x-input-error :messages="$errors->get('gambarBarang')" class="mt-2" />
                 </div>
 
                 <div>
@@ -232,7 +221,7 @@
 
                     <textarea name="desc"
                         class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-                        id="desc">{{ old('desc', $location->desc) }}</textarea>
+                        id="desc">{{ old('desc',  $item->desc) }}</textarea>
 
                     <x-input-error :messages="$errors->get('desc')" class="mt-2" />
                 </div>

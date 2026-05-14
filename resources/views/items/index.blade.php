@@ -74,29 +74,23 @@
                             <tr>
 
                                 <td class="px-8 py-6 dark:text-slate-200 font-bold">{{ $item->item_name }}</td>
-                                <td class="px-8 py-6 dark:text-slate-200">
-                                    {{ $item->size === 'small' ? 'Lokasi Kecil' : ($item->size === 'medium' ? 'Lokasi Sedang' : 'Lokasi Besar') }}
-                                </td>
+                                <td class="px-8 py-6 dark:text-slate-200 font-bold">{{ $item->location->location_name }}</td>
                                 <td class="px-8 py-6 dark:text-slate-200">
                                     @switch($item->status)
-                                        @case('available')
-                                            <span class="bg-green-600 rounded-md px-2 py-1 text-xs">Lokasi Tersedia</span>
+                                        @case('good')
+                                            <span class="bg-green-600 rounded-md px-2 py-1 text-xs">Kondisi Normal</span>
                                         @break
 
-                                        @case('close')
-                                            <span class="bg-red-600 rounded-md px-2 py-1 text-xs">Lokasi Ditutup</span>
-                                        @break
-
-                                        @case('full')
-                                            <span class="bg-gray-600 rounded-md px-2 py-1 text-xs">Lokasi Penuh</span>
+                                        @case('broke')
+                                            <span class="bg-red-600 rounded-md px-2 py-1 text-xs">Kondisi Rusak</span>
                                         @break
 
                                         @default
-                                            <span class="bg-yellow-600 rounded-md px-2 py-1 text-xs">Lokasi Maintenance</span>
+                                            <span class="bg-yellow-600 rounded-md px-2 py-1 text-xs">Barang sedang maintenance</span>
                                     @endswitch
                                 </td>
                                 <td class="px-8 py-6 dark:text-slate-200">
-                                    <a href="{{ route('lokasi.show', $item->uuid) }}"
+                                    <a href="{{ route('barang.show', $item->uuid) }}"
                                         class="px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-700 hover:to-violet-700 transition-all duration-300 ease-out hover:scale-105 hover:-translate-y-0.5">detail</a>
                                 </td>
 
@@ -147,7 +141,7 @@
                             <option value="" disabled>Pilih Lokasi</option>
                             @forelse ($locations as $location)
                                 <option class="" value="{{ $location->id }}"
-                                    {{ old('penyimpanan') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
+                                    {{ old('penyimpanan') == $location->id ? 'selected' : '' }}>{{ $location->location_name }}</option>
                             @empty
                                 <option value="" disabled>Data lokasi tidak ada</option>
                             @endforelse
@@ -181,7 +175,7 @@
                     <div>
                         <x-input-label id="tanggalPembelian" value="Tanggal Pembelian" />
 
-                        <x-text-input id="tanggalPembelian" class="block mt-1 w-full" type="text" name="tanggalPembelian"
+                        <x-text-input id="tanggalPembelian" class="block mt-1 w-full" type="date" name="tanggalPembelian"
                             :value="old('tanggalPembelian')" required autofocus autocomplete="tanggalPembelian" />
                         <x-input-error :messages="$errors->get('tanggalPembelian')" class="mt-2" />
                     </div>
